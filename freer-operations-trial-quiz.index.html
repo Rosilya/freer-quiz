@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Freer Operations Trial Assessment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16233d;
+    --navy:#1b2a4a;
+    --navy-deep:#101a30;
+    --paper:#f6f3ec;
+    --paper-warm:#efe9db;
+    --gold:#c9932b;
+    --gold-soft:#e3c88a;
+    --teal:#2e6f6e;
+    --coral:#c15b45;
+    --sage:#6b8f71;
+    --plum:#7d5ba6;
+    --slate:#46648c;
+    --terra:#b8763e;
+    --rose:#a8556e;
+    --line:rgba(22,35,61,0.14);
+    --good:#2e6f4e;
+    --bad:#a63b2e;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .app{width:100%;max-width:760px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--teal);display:flex;align-items:center;gap:8px;margin-bottom:10px;
+  }
+  .eyebrow::before{content:'';width:16px;height:1px;background:var(--teal);display:inline-block;}
+  h1{
+    font-family:'Fraunces',serif;font-weight:600;font-size:clamp(26px,4vw,38px);
+    line-height:1.1;margin:0 0 14px;color:var(--navy-deep);
+  }
+  .lede{font-size:15px;line-height:1.6;color:#3c4a63;max-width:58ch;margin:0 0 26px;}
+  .route-wrap{position:relative;margin:0 0 28px;padding:20px 20px 16px;background:var(--navy);border-radius:4px;overflow:hidden;}
+  .route-wrap svg{display:block;width:100%;height:56px;}
+  .route-label{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.06em;color:var(--gold-soft);margin-top:8px;}
+  .route-label b{color:#fff;font-weight:600;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:3px;padding:32px;}
+  .stat-row{display:flex;gap:20px;margin:22px 0 28px;flex-wrap:wrap;}
+  .stat{flex:1;min-width:120px;border-left:2px solid var(--gold);padding-left:12px;}
+  .stat .n{font-family:'Fraunces',serif;font-size:24px;color:var(--navy-deep);font-weight:600;display:block;}
+  .stat .l{font-size:11px;color:#6b7690;letter-spacing:.02em;}
+  .cat-list{list-style:none;padding:0;margin:0 0 28px;display:grid;gap:8px;grid-template-columns:1fr;}
+  .cat-list li{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#3c4a63;padding:8px 0;border-bottom:1px solid var(--line);}
+  .cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  button.primary{
+    background:var(--navy-deep);color:#fff;border:none;font-family:'Inter',sans-serif;
+    font-weight:600;font-size:14.5px;padding:14px 26px;border-radius:2px;cursor:pointer;
+    letter-spacing:.01em;transition:background .15s ease;
+  }
+  button.primary:hover{background:var(--navy);}
+  button.primary:disabled{background:#c7cbd6;cursor:not-allowed;}
+  button.primary:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  button.ghost{
+    background:none;border:1px solid var(--line);color:var(--ink);font-family:'Inter',sans-serif;
+    font-weight:600;font-size:13.5px;padding:12px 20px;border-radius:2px;cursor:pointer;
+  }
+  button.ghost:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .q-meta{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+  .q-cat{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--teal);}
+  .q-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:#8892a6;}
+  .q-text{font-family:'Fraunces',serif;font-weight:600;font-size:20px;line-height:1.35;color:var(--navy-deep);margin:12px 0 24px;}
+  .options{display:grid;gap:10px;margin-bottom:26px;}
+  .opt{
+    display:flex;align-items:flex-start;gap:12px;text-align:left;border:1px solid var(--line);
+    background:var(--paper);padding:13px 16px;border-radius:2px;cursor:pointer;font-size:14px;
+    font-family:'Inter',sans-serif;color:var(--ink);transition:border-color .12s ease, background .12s ease;
+  }
+  .opt:hover{border-color:var(--gold);}
+  .opt.selected{border-color:var(--navy);background:#eef1f7;}
+  .opt.correct{border-color:var(--good);background:#e9f3ec;}
+  .opt.incorrect{border-color:var(--bad);background:#f7ebe9;}
+  .opt-letter{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:#8892a6;flex-shrink:0;margin-top:1px;}
+  .opt.correct .opt-letter{color:var(--good);}
+  .opt.incorrect .opt-letter{color:var(--bad);}
+  .explain{
+    font-size:13px;line-height:1.6;color:#3c4a63;background:var(--paper-warm);border-left:3px solid var(--gold);
+    padding:12px 16px;margin-bottom:22px;border-radius:0 2px 2px 0;display:none;
+  }
+  .explain.show{display:block;}
+  .nav-row{display:flex;justify-content:flex-end;gap:10px;}
+  .score-hero{display:flex;align-items:center;gap:24px;padding-bottom:22px;margin-bottom:22px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .score-num{font-family:'Fraunces',serif;font-weight:700;font-size:52px;color:var(--navy-deep);line-height:1;}
+  .score-num span{font-size:20px;color:#8892a6;font-weight:500;}
+  .verdict{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:6px 12px;border-radius:20px;font-weight:500;}
+  .verdict.pass{background:#e9f3ec;color:var(--good);}
+  .verdict.fail{background:#f7ebe9;color:var(--bad);}
+  .breakdown{display:grid;gap:12px;margin-bottom:26px;}
+  .bd-row{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:center;}
+  .bd-label{font-size:13px;color:#3c4a63;}
+  .bd-frac{font-family:'JetBrains Mono',monospace;font-size:12px;color:#8892a6;}
+  .bar-track{grid-column:1/-1;height:6px;background:var(--paper-warm);border-radius:3px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:3px;transition:width .5s ease;}
+  .review-toggle{margin-bottom:16px;}
+  .review-item{border-top:1px solid var(--line);padding:14px 0;}
+  .review-q{font-size:13.5px;font-weight:600;color:var(--navy-deep);margin-bottom:6px;}
+  .review-a{font-size:13px;color:#3c4a63;margin:4px 0;}
+  .tag-correct{color:var(--good);font-weight:600;}
+  .tag-wrong{color:var(--bad);font-weight:600;}
+  #review-panel{display:none;}
+  #review-panel.show{display:block;}
+  @media (prefers-reduced-motion: reduce){.bar-fill{transition:none;}}
+  @media (max-width:520px){.card{padding:22px;}.score-num{font-size:40px;}}
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const CATEGORIES = [
+  {id:'mission', name:'Mission, Vision & Scope', color:'#c9932b'},
+  {id:'ai', name:'AI Tool Use & Confidentiality', color:'#7d5ba6'},
+  {id:'docs', name:'Documentation & Email Response', color:'#2e6f6e'},
+  {id:'tele', name:'Telemarketing Calls & Notes', color:'#c15b45'},
+  {id:'incentive', name:'Incentive Claims', color:'#b8763e'},
+  {id:'finance', name:'Timesheet & Invoice', color:'#46648c'},
+  {id:'meeting', name:'Meeting Coordination', color:'#6b8f71'},
+  {id:'escalate', name:'Critical Thinking & Escalation', color:'#1b2a4a'},
+  {id:'leads', name:'Handling Difficult Lead Situations', color:'#a8556e'}
+];
+
+const QUESTIONS = [
+  {cat:'mission', q:'What is Freer\'s core mission?',
+   options:['To enable individuals and businesses to design a freer and global life','To become the largest call center in Asia','To sell telecom products locally','To manage payroll for other companies'],
+   correct:0, explain:'Freer\'s mission centers on enabling people and businesses to build a freer, more global life. That mission is the reason behind every client program the team runs.'},
+  {cat:'mission', q:'Which statement best reflects Freer\'s vision?',
+   options:['To build a society where everyone is free to challenge and grow','To dominate the Japanese stock market','To replace human contact with automation entirely','To operate only within Japan'],
+   correct:0, explain:'The vision is about building a society where people feel free to challenge themselves and grow, which is why client work often blends language, networking and expansion support.'},
+  {cat:'mission', q:'As a Global Expansion Specialist or Research Assistant, what is a core part of your role?',
+   options:['Helping clients understand market dynamics, regulations and cultural nuances for international expansion','Managing the company\'s internal payroll system','Designing marketing graphics for social media','Handling only customer complaints'],
+   correct:0, explain:'The role exists to support clients as they expand internationally, which means researching markets, regulations and cultural context so clients can make informed decisions.'},
+
+  {cat:'ai', q:'According to Freer\'s policy, how is ChatGPT meant to be used at work?',
+   options:['For brainstorming, drafting or summarizing, never as the primary research source','As the sole and authoritative source for all client research','For storing confidential client files securely','For automatically sending client emails without review'],
+   correct:0, explain:'ChatGPT can help with brainstorming and drafting, but every piece of information it produces still needs to be verified independently before it\'s used with a client.'},
+  {cat:'ai', q:'Before entering information into ChatGPT or another public AI tool, what must you always do?',
+   options:['Remove or avoid any confidential client details, sharing only generalized or anonymized information','Nothing, all information can be shared freely','Ask the client for written permission every time','Translate the information into Japanese first'],
+   correct:0, explain:'Client documents, strategies, contact lists and other sensitive details should never be pasted into a public AI tool. Only generalized, anonymized information is safe to use there.'},
+  {cat:'ai', q:'If you are unsure whether something counts as confidential information, what should you do?',
+   options:['Treat it as confidential and check with your supervisor before using any AI tool','Paste it into the AI tool anyway since it\'s probably fine','Only mention it casually to a coworker','Use it in the tool and delete it right after'],
+   correct:0, explain:'When in doubt, the safe default is to treat the information as confidential and confirm with a supervisor first, rather than risk exposing client data.'},
+
+  {cat:'docs', q:'When you log a lead\'s reply in the tracking sheet, which details matter most?',
+   options:['The date the reply was received and the method used, such as email, call or WhatsApp','Only the lead\'s personal hobbies','Nothing, response tracking is optional','The lead\'s home address'],
+   correct:0, explain:'Clean documentation means recording when a reply came in and how it arrived, so anyone reviewing the sheet later can see the real timeline without guessing.'},
+  {cat:'docs', q:'In the lead status color coding system, what does a red label usually mean?',
+   options:['An interested lead who is open to further discussion','A lead who refused and shouldn\'t be contacted again','An internal team meeting','A lead in a different timezone'],
+   correct:0, explain:'Red marks a genuinely interested lead, which is why those cases are usually scheduled for a follow up call or meeting within a few business days.'},
+  {cat:'docs', q:'What does a yellow label represent in the same system?',
+   options:['A potential or undecided lead that needs more nurturing and follow up','A confirmed sale ready for invoicing','A lead who has blocked all contact','A completed internal task'],
+   correct:0, explain:'Yellow flags a lead who is neither clearly interested nor clearly refusing, so the right move is a polite follow up rather than writing them off.'},
+  {cat:'docs', q:'What should you do with auto reply, bot generated or promotional emails?',
+   options:['Archive them right away and keep them out of client or project labels','Star them for priority follow up','Forward them straight to the client','Reply to confirm you received them'],
+   correct:0, explain:'These emails add noise rather than value, so archiving them immediately keeps the inbox and client labels clean and easy to trust.'},
+
+  {cat:'tele', q:'Before making outbound calls into a new country, what should you check first?',
+   options:['The local timezone and business hours so you don\'t call at an inappropriate time','Only your own local time','Nothing in particular, you can call anytime','The local weather forecast'],
+   correct:0, explain:'Every country has its own working hours and sometimes even its own weekend. Checking this ahead of time avoids wasted calls and shows respect for the client\'s schedule.'},
+  {cat:'tele', q:'What is the recommended approach when a client doesn\'t understand or speak English well?',
+   options:['Politely acknowledge it and offer to follow up by email instead','Hang up immediately','Speak louder and slower until they understand','Transfer the call without any explanation'],
+   correct:0, explain:'Rather than pushing through a language barrier, it\'s better to acknowledge it kindly, confirm their email address, and continue the conversation in writing.'},
+  {cat:'tele', q:'If a caller becomes aggressive or visibly frustrated, what is the recommended first step?',
+   options:['Stay calm, avoid taking it personally, and let them express their concern first','Argue back to defend the company','End the call immediately without a word','Match their tone and raise your voice'],
+   correct:0, explain:'Staying composed and letting the person vent first usually de-escalates the situation faster than jumping straight into a defense or a rebuttal.'},
+  {cat:'tele', q:'What should be updated in the call tracking sheet after every call attempt?',
+   options:['The status, such as not interested, spoke with key person, or needs follow up, along with the date of contact','Nothing until the deal actually closes','Only calls that were successful','Your personal opinion of the client'],
+   correct:0, explain:'Every call, successful or not, should be logged with a clear status and date so the next person picking up that lead knows exactly where things stand.'},
+
+  {cat:'incentive', q:'What is required before you can receive incentive payment for a qualifying activity?',
+   options:['Submitting an Incentive Claim Form for that specific activity','Simply mentioning it to a coworker','Nothing, incentives are paid automatically','Posting about it on social media'],
+   correct:0, explain:'Incentives aren\'t automatic. Each eligible activity needs its own claim form submitted so it can be reviewed and approved before payment.'},
+  {cat:'incentive', q:'When your monthly invoice includes an incentive, what should you include alongside it?',
+   options:['The total incentive amount, the number of incentives claimed, and the incentive type','Only your base hourly rate','A screenshot of the client\'s website','The lead\'s personal contact information'],
+   correct:0, explain:'Spelling out the amount, count and type of each incentive keeps the invoice clear and makes it much faster for management to approve.'},
+
+  {cat:'finance', q:'If a task you were assigned isn\'t listed in your timesheet dropdown, what should you do?',
+   options:['Notify the project owner or consultant right away so it can be added','Leave that entry blank for the day','Pick the closest matching task and move on','Wait until next month to mention it'],
+   correct:0, explain:'An unlisted task means your hours can\'t be tracked or invoiced correctly, so flagging it immediately protects your own pay as much as the client\'s billing.'},
+  {cat:'finance', q:'What is the correct file naming format for a monthly invoice?',
+   options:['Name, then Invoice, then Month, then Year, for example Ilya Invoice April 2025','Just your name and today\'s date','The invoice number only','Any format works as long as it\'s a PDF'],
+   correct:0, explain:'A consistent naming pattern makes invoices easy to find and match against timesheets when the whole team is submitting at once.'},
+  {cat:'finance', q:'Which of these is a common mistake to avoid when submitting an invoice?',
+   options:['Using a non sequential invoice number or entering incorrect bank details','Submitting exactly on the deadline','Using the official invoice template','Including clear task descriptions'],
+   correct:0, explain:'Small errors like a skipped invoice number or a mistyped account number are what usually cause payment delays, so double checking those fields matters most.'},
+
+  {cat:'meeting', q:'Before scheduling a client meeting, what should you check first?',
+   options:['The relevant leader\'s calendar availability','Nothing, meetings can just be booked directly','Only your own calendar','The client\'s preferred restaurant'],
+   correct:0, explain:'Since leaders often attend screening or client meetings, their availability has to be confirmed before any time slot is proposed or blocked.'},
+  {cat:'meeting', q:'What should the calendar title show for a meeting that hasn\'t been confirmed yet?',
+   options:['TBC followed by the client name and company name','The final confirmed meeting title from the very start','No title at all','Just the word Meeting'],
+   correct:0, explain:'Marking it as TBC keeps everyone aware that the time is only tentative until the lead formally confirms.'},
+  {cat:'meeting', q:'What information should a meeting calendar description include so a leader can prepare quickly?',
+   options:['The meeting link, company background, PIC name, contact details and meeting objective','Just the meeting link','Nothing, leaders are expected to research it themselves','Only the timezone'],
+   correct:0, explain:'Leaders often have very little lead time to prepare, so a well filled out description does the background work for them in advance.'},
+  {cat:'meeting', q:'After a client confirms a meeting, what should happen to the calendar entry?',
+   options:['Remove the TBC label and update the title to reflect the confirmed meeting','Delete the meeting entirely','Leave the TBC label as it is','Move it to a different day without telling anyone'],
+   correct:0, explain:'Updating the title once confirmed keeps the calendar accurate and signals to the whole team that the meeting is now locked in.'},
+
+  {cat:'escalate', q:'If a call situation escalates beyond what you\'re able to handle, what is the correct next step?',
+   options:['Inform the appropriate department or supervisor so they can assist','Keep pushing through the call on your own no matter what','Hang up and say nothing to anyone','Post about the incident publicly'],
+   correct:0, explain:'Some situations genuinely need a supervisor\'s involvement, and recognizing that early protects both you and the client relationship.'},
+  {cat:'escalate', q:'Your GTL hasn\'t responded yet about an urgent lead decision. What is the most appropriate action?',
+   options:['Post an update in the progress check channel, tag your GTL, and continue other tasks while you wait','Do nothing and wait silently until they reply','Make the final call yourself without telling anyone','Escalate straight to the client instead of your team'],
+   correct:0, explain:'Flagging the situation clearly and moving on to other work keeps things moving without forcing a decision that isn\'t yours to make alone.'},
+  {cat:'escalate', q:'What should you do if you find conflicting or unclear information while researching a lead or market?',
+   options:['Verify against the most reliable and recent source, and flag it if it\'s still uncertain','Use whichever number sounds better for the report','Ignore the discrepancy and move on','Ask the client which number they\'d prefer to see'],
+   correct:0, explain:'Cross checking against a trustworthy source protects the quality of your research, and flagging genuine uncertainty is far better than guessing.'},
+  {cat:'escalate', q:'What can happen if you repeatedly fail to meet task commitments or decline assigned work?',
+   options:['A review of your role, reduced assignments, or other performance action','An automatic bonus','No consequences at all','A guaranteed promotion'],
+   correct:0, explain:'Accountability matters here. Consistently missing commitments affects the whole team\'s workload, which is why it\'s taken seriously.'},
+
+  {cat:'leads', q:'A lead asks whether your company is a scam. What is the most appropriate way to respond?',
+   options:['Respond calmly and professionally, offering verifiable details like the official website, contact information and services offered','Hang up immediately without responding','Ignore the question and change the subject','Argue with the lead about the assumption'],
+   correct:0, explain:'A calm, transparent answer with real, checkable details builds far more trust than getting defensive or dodging the question.'},
+  {cat:'leads', q:'A lead asks for more detailed information before agreeing to a meeting. What should you do?',
+   options:['Offer relevant materials or point them to official resources, and involve your supervisor if the request goes beyond what you\'re authorized to share','Refuse to give any additional information at all','Make up details just to satisfy them quickly','End the conversation right away'],
+   correct:0, explain:'It\'s fine to share what you\'re authorized to share and loop in a supervisor for anything beyond that, rather than inventing details or shutting the conversation down.'},
+  {cat:'leads', q:'A lead hasn\'t responded after your first outreach message. What is best practice for following up?',
+   options:['Send one polite follow up message within a reasonable timeframe, such as one to two weeks depending on the lead\'s status','Message them every single day until they respond','Assume they\'re not interested and remove them right away','Call them repeatedly within the same hour'],
+   correct:0, explain:'A respectful, well timed follow up keeps the door open without pressuring the lead, which tends to get better results than persistence that feels pushy.'}
+];
+
+function shuffleOptions(q){
+  const order = q.options.map((_,i)=>i);
+  for(let i=order.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [order[i],order[j]] = [order[j],order[i]];
+  }
+  return {
+    ...q,
+    options: order.map(i=>q.options[i]),
+    correct: order.indexOf(q.correct)
+  };
+}
+
+function shuffleAllQuestions(){
+  return QUESTIONS_BASE.map(shuffleOptions);
+}
+
+const QUESTIONS_BASE = QUESTIONS.slice();
+let SHUFFLED = shuffleAllQuestions();
+
+const PASS_THRESHOLD = 0.75;
+let current = 0;
+let answers = new Array(SHUFFLED.length).fill(null);
+let answered = false;
+
+const app = document.getElementById('app');
+
+function catInfo(id){ return CATEGORIES.find(c=>c.id===id); }
+
+function renderRoute(progress){
+  const w = 680, y = 28;
+  const dots = SHUFFLED.length;
+  let dotSvg = '';
+  for(let i=0;i<dots;i++){
+    const x = 20 + (i/(dots-1)) * (w-40);
+    const done = i < current;
+    const activeNow = i === current;
+    dotSvg += `<circle cx="${x}" cy="${y}" r="${activeNow?4:2.6}" fill="${done?'#e3c88a':(activeNow?'#c9932b':'rgba(255,255,255,0.22)')}" />`;
+  }
+  const planeX = 20 + progress * (w-40);
+  return `
+  <svg viewBox="0 0 ${w} 56" preserveAspectRatio="none">
+    <line x1="20" y1="${y}" x2="${w-20}" y2="${y}" stroke="rgba(255,255,255,0.18)" stroke-width="1" stroke-dasharray="2,4"/>
+    ${dotSvg}
+    <g transform="translate(${planeX},${y-9})">
+      <path d="M0 9 L6 0 L 4 9 L 6 18 Z" fill="#f6f3ec" transform="translate(-3,-9)"/>
+    </g>
+  </svg>`;
+}
+
+function renderLanding(){
+  const catRows = CATEGORIES.map(c=>{
+    const count = SHUFFLED.filter(q=>q.cat===c.id).length;
+    return `<li><span class="cat-dot" style="background:${c.color}"></span>${c.name}<span style="margin-left:auto;color:#8892a6;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${count} Q</span></li>`;
+  }).join('');
+  app.innerHTML = `
+    <div class="eyebrow">New Hire Trial Assessment</div>
+    <h1>Freer Operations &amp; Telemarketing Trial</h1>
+    <p class="lede">This trial checks working knowledge of the operational manual and the telemarketing manual together. It covers company mission and scope, AI tool rules, documentation and email response, call handling, incentives, timesheets and invoices, meeting coordination, and how to handle tricky lead situations. Untimed, ${SHUFFLED.length} questions, feedback after every answer.</p>
+    <div class="stat-row">
+      <div class="stat"><span class="n">${SHUFFLED.length}</span><span class="l">QUESTIONS</span></div>
+      <div class="stat"><span class="n">${CATEGORIES.length}</span><span class="l">SCOPE AREAS</span></div>
+      <div class="stat"><span class="n">${Math.round(PASS_THRESHOLD*100)}%</span><span class="l">PASS THRESHOLD</span></div>
+    </div>
+    <ul class="cat-list">${catRows}</ul>
+    <button class="primary" id="start-btn">Start assessment</button>
+  `;
+  document.getElementById('start-btn').onclick = ()=>{ current=0; renderQuestion(); };
+}
+
+function renderQuestion(){
+  const q = SHUFFLED[current];
+  const cat = catInfo(q.cat);
+  const progress = current/(SHUFFLED.length-1);
+  const priorAnswer = answers[current];
+  answered = priorAnswer !== null;
+
+  const optHtml = q.options.map((opt,i)=>{
+    let cls = 'opt';
+    if(answered){
+      if(i===q.correct) cls += ' correct';
+      else if(i===priorAnswer && i!==q.correct) cls += ' incorrect';
+    } else if(i===priorAnswer){
+      cls += ' selected';
+    }
+    const letter = String.fromCharCode(65+i);
+    return `<button class="${cls}" data-i="${i}" ${answered?'disabled':''}>
+      <span class="opt-letter">${letter}</span><span>${opt}</span>
+    </button>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="eyebrow">New Hire Trial Assessment</div>
+    <div class="route-wrap">
+      ${renderRoute(progress)}
+      <div class="route-label"><span>START</span><span><b>${current+1}</b> / ${SHUFFLED.length}</span><span>FINISH</span></div>
+    </div>
+    <div class="card">
+      <div class="q-meta">
+        <span class="q-cat" style="color:${cat.color}">${cat.name}</span>
+        <span class="q-count">Q${current+1} of ${SHUFFLED.length}</span>
+      </div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${optHtml}</div>
+      <div class="explain ${answered?'show':''}" id="explain">${q.explain}</div>
+      <div class="nav-row">
+        ${current>0?'<button class="ghost" id="back-btn">Back</button>':''}
+        <button class="primary" id="next-btn" ${answered?'':'disabled'}>${current===SHUFFLED.length-1?'See results':'Next question'}</button>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.opt').forEach(btn=>{
+    btn.onclick = ()=>{
+      if(answered) return;
+      const i = parseInt(btn.dataset.i);
+      answers[current] = i;
+      renderQuestion();
+    };
+  });
+  const backBtn = document.getElementById('back-btn');
+  if(backBtn) backBtn.onclick = ()=>{ current--; renderQuestion(); };
+  document.getElementById('next-btn').onclick = ()=>{
+    if(current < SHUFFLED.length-1){ current++; renderQuestion(); }
+    else { renderResults(); }
+  };
+}
+
+function renderResults(){
+  const total = SHUFFLED.length;
+  let correctCount = 0;
+  const catStats = {};
+  CATEGORIES.forEach(c=>catStats[c.id]={correct:0,total:0});
+
+  SHUFFLED.forEach((q,i)=>{
+    catStats[q.cat].total++;
+    if(answers[i]===q.correct){ correctCount++; catStats[q.cat].correct++; }
+  });
+
+  const pct = correctCount/total;
+  const passed = pct >= PASS_THRESHOLD;
+
+  const bdHtml = CATEGORIES.map(c=>{
+    const s = catStats[c.id];
+    const p = s.total ? (s.correct/s.total*100) : 0;
+    return `<div class="bd-row">
+      <span class="bd-label">${c.name}</span>
+      <span class="bd-frac">${s.correct}/${s.total}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${c.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  const reviewHtml = SHUFFLED.map((q,i)=>{
+    const yourAns = answers[i];
+    const isCorrect = yourAns===q.correct;
+    return `<div class="review-item">
+      <div class="review-q">Q${i+1}. ${q.q}</div>
+      <div class="review-a">Your answer: <span class="${isCorrect?'tag-correct':'tag-wrong'}">${q.options[yourAns]}</span></div>
+      ${!isCorrect?`<div class="review-a">Correct answer: <span class="tag-correct">${q.options[q.correct]}</span></div>`:''}
+      <div class="review-a" style="color:#6b7690;">${q.explain}</div>
+    </div>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="eyebrow">Assessment Complete</div>
+    <h1>Trial Results</h1>
+    <div class="card">
+      <div class="score-hero">
+        <div class="score-num">${correctCount}<span>/${total}</span></div>
+        <div class="verdict ${passed?'pass':'fail'}">${passed?'Pass':'Needs Review'} at ${Math.round(pct*100)}%</div>
+      </div>
+      <div class="breakdown">${bdHtml}</div>
+      <div class="review-toggle">
+        <button class="ghost" id="toggle-review">Show answer review</button>
+      </div>
+      <div id="review-panel">${reviewHtml}</div>
+      <div class="nav-row" style="margin-top:22px;justify-content:space-between;">
+        <button class="ghost" id="retake-btn">Retake assessment</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('toggle-review').onclick = (e)=>{
+    const panel = document.getElementById('review-panel');
+    panel.classList.toggle('show');
+    e.target.textContent = panel.classList.contains('show') ? 'Hide answer review' : 'Show answer review';
+  };
+  document.getElementById('retake-btn').onclick = ()=>{
+    current=0; SHUFFLED = shuffleAllQuestions(); answers = new Array(SHUFFLED.length).fill(null); renderLanding();
+  };
+}
+
+renderLanding();
+</script>
+</body>
+</html>
